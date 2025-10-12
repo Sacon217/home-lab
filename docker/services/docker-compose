@@ -19,7 +19,7 @@ services:
       - "8443:443/tcp" # Change default ports for Pi-hole due to NPM using the 443 for HTTPS
     environment:
       TZ: "America/Costa_Rica"
-      FTLCONF_webserver_api_password: ""
+      FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
       FTLCONF_dns_listeningMode: "all"
     volumes:
       - "/srv/docker/pihole/etc-pihole:/etc/pihole"
