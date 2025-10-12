@@ -1,0 +1,15 @@
+# Environment files with sensitive data
+.env
+
+# Docker volumes and data
+npm-data/
+npm-ssl/
+pihole/
+letsencrypt/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
