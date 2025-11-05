@@ -17,6 +17,10 @@ services:
       - "53:53/udp"
       - "8080:80/tcp" # Change default ports for Pi-hole due to NPM using the 80 for HTTP
       - "8443:443/tcp" # Change default ports for Pi-hole due to NPM using the 443 for HTTPS
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_NICE 
     environment:
       TZ: "America/Costa_Rica"
       FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
