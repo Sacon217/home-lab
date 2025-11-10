@@ -3,6 +3,9 @@ version: "3.9"
 networks:
   private:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
   edge:
     driver: bridge
 
@@ -13,7 +16,7 @@ services:
     restart: unless-stopped
     networks:
       private:
-        ipv4_address: 172.20.0.2  # Fixed IP in Docker network
+        ipv4_address: 172.20.0.2
     ports:
       - "53:53/tcp"
       - "53:53/udp"
@@ -25,7 +28,7 @@ services:
     environment:
       TZ: "America/Costa_Rica"
       FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
-      FTLCONF_dns_listeningMode: "all"  # Change to "all" for Docker networking
+      FTLCONF_dns_listeningMode: "all"
       PIHOLE_DNS_: "1.1.1.1;1.0.0.1"
     volumes:
       - "/srv/docker/pihole/etc-pihole:/etc/pihole"
@@ -64,12 +67,3 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-networks:
-  private:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-  edge:
-    driver: bridge
