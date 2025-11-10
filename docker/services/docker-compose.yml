@@ -13,10 +13,10 @@ services:
     restart: unless-stopped
     networks: [private]
     ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "8080:80/tcp" # Change default ports for Pi-hole due to NPM using the 80 for HTTP
-      - "8443:443/tcp" # Change default ports for Pi-hole due to NPM using the 443 for HTTPS
+      - "192.168.100.52:53:53/tcp"
+      - "192.168.100.52:53:53/udp"
+      - "192.168.100.52:8080:80/tcp" # Change default ports for Pi-hole due to NPM using the 80 for HTTP
+      - "192.168.100.52:8443:443/tcp" # Change default ports for Pi-hole due to NPM using the 443 for HTTPS
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -25,7 +25,7 @@ services:
     environment:
       TZ: "America/Costa_Rica"
       FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
-      FTLCONF_dns_listeningMode: "all"
+      FTLCONF_dns_listeningMode: "local"
     volumes:
       - "/srv/docker/pihole/etc-pihole:/etc/pihole"
       - "/srv/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
@@ -50,7 +50,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "81:81"
+      - "192.168.100.52:81:81"
     volumes:
       - "/srv/docker/npm/data:/data"
       - "/srv/docker/npm/letsencrypt:/etc/letsencrypt"
