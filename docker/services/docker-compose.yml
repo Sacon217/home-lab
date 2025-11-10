@@ -11,17 +11,7 @@ services:
     image: pihole/pihole:latest
     container_name: pihole
     restart: unless-stopped
-    networks: [private]
-    ports:
-      # DNS - 0.0.0.0 for LAN access (secure: router doesn't forward port 53 + ISP blocks it)
-      - "53:53/tcp"
-      - "53:53/udp"
-      # Web interface - bind to LAN IP only for direct access
-      - "192.168.100.52:8080:80/tcp"
-      - "192.168.100.52:8443:443/tcp"
-    expose:
-      - "80"   # Also expose to Docker network for NPM reverse proxy
-      - "443"
+    network_mode: host
     cap_add:
       - NET_ADMIN
       - NET_RAW
@@ -29,6 +19,7 @@ services:
       TZ: "America/Costa_Rica"
       FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
       FTLCONF_dns_listeningMode: "local"
+      WEB_PORT: "8080"
     volumes:
       - "/srv/docker/pihole/etc-pihole:/etc/pihole"
       - "/srv/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
