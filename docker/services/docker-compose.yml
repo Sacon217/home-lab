@@ -13,18 +13,16 @@ services:
     restart: unless-stopped
     networks: [private]
     ports:
-      - "192.168.100.52:53:53/tcp"
-      - "192.168.100.52:53:53/udp"
+      - "53:53/tcp"
+      - "53:53/udp"
       - "192.168.100.52:8080:80/tcp" # Change default ports for Pi-hole due to NPM using the 80 for HTTP
       - "192.168.100.52:8443:443/tcp" # Change default ports for Pi-hole due to NPM using the 443 for HTTPS
     expose:
       - "80"   # Expose to Docker network only (not host)
       - "443"  # Expose to Docker network only (not host)
-    cap_add:
+   cap_add:
       - NET_ADMIN
       - NET_RAW
-      - SYS_NICE
-      - CAP_SYS_TIME
     environment:
       TZ: "America/Costa_Rica"
       FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
