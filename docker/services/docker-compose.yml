@@ -20,7 +20,7 @@ services:
     expose:
       - "80"   # Expose to Docker network only (not host)
       - "443"  # Expose to Docker network only (not host)
-   cap_add:
+    cap_add:
       - NET_ADMIN
       - NET_RAW
     environment:
