@@ -11,15 +11,22 @@ services:
     image: pihole/pihole:latest
     container_name: pihole
     restart: unless-stopped
-    network_mode: host
+    networks:
+      private:
+        ipv4_address: 172.20.0.2  # Fixed IP in Docker network
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "192.168.100.52:8080:80/tcp"
+      - "192.168.100.52:8443:443/tcp"
     cap_add:
       - NET_ADMIN
       - NET_RAW
     environment:
       TZ: "America/Costa_Rica"
       FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
-      FTLCONF_dns_listeningMode: "local"
-      WEB_PORT: "8080"
+      FTLCONF_dns_listeningMode: "all"  # Change to "all" for Docker networking
+      PIHOLE_DNS_: "1.1.1.1;1.0.0.1"
     volumes:
       - "/srv/docker/pihole/etc-pihole:/etc/pihole"
       - "/srv/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
@@ -38,7 +45,10 @@ services:
     image: jc21/nginx-proxy-manager:latest
     container_name: npm
     depends_on: [pihole]
-    networks: [edge, private]
+    networks:
+      edge:
+      private:
+        ipv4_address: 172.20.0.3
     environment:
       TZ: "America/Costa_Rica"
     ports:
@@ -54,3 +64,12 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+networks:
+  private:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  edge:
+    driver: bridge
