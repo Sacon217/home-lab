@@ -13,11 +13,15 @@ services:
     restart: unless-stopped
     networks: [private]
     ports:
+      # DNS - 0.0.0.0 for LAN access (secure: router doesn't forward port 53 + ISP blocks it)
       - "53:53/tcp"
       - "53:53/udp"
+      # Web interface - bind to LAN IP only for direct access
+      - "192.168.100.52:8080:80/tcp"
+      - "192.168.100.52:8443:443/tcp"
     expose:
-      - "80"   # Expose to Docker network only (not host)
-      - "443"  # Expose to Docker network only (not host)
+      - "80"   # Also expose to Docker network for NPM reverse proxy
+      - "443"
     cap_add:
       - NET_ADMIN
       - NET_RAW
