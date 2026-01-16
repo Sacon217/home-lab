@@ -6,6 +6,8 @@ services:
     container_name: noname-api
     restart: always
     working_dir: /app
+    ports:
+      - "5000:5000"
     command: |
       sh -c "pip install flask && cat > app.py << 'EOF'
       from flask import Flask, request, jsonify
