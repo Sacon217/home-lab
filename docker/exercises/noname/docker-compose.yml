@@ -9,17 +9,13 @@ services:
     ports:
       - "5000:5000"
     command: |
-      sh -c "pip install flask && cat > app.py << 'EOF'
-      from flask import Flask, request, jsonify
-      
+      sh -c "pip install flask && python -c \"
+      from flask import Flask, jsonify
       app = Flask(__name__)
       
       @app.route('/')
       def home():
-          response_name = {'message': 'Welcome No Name Security!'}
-          return jsonify(response_name), 200
+          return jsonify({'message': 'Welcome No Name Security!'}), 200
       
-      if __name__ == '__main__':
-          app.run(debug=True)
-      EOF
-      python app.py"
+      app.run(host='0.0.0.0', port=5000, debug=True)
+      \""
