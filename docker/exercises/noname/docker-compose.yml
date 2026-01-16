@@ -2,9 +2,7 @@ version: '3.8'
 
 services:
   api:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: noname-api
     restart: always
     
