@@ -6,9 +6,8 @@ services:
     container_name: noname-api
     restart: always
     working_dir: /app
-    command: >
-      sh -c "pip install flask &&
-      cat > app.py << 'EOF'
+    command: |
+      sh -c "pip install flask && cat > app.py << 'EOF'
       from flask import Flask, request, jsonify
       
       app = Flask(__name__)
