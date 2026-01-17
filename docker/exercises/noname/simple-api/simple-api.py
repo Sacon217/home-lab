@@ -62,13 +62,20 @@ def get_all_users():
         'users': all_users
     }), 200
 
-@app.route('/users/<user_id>', methods=['GET'])
-def get_user(user_id):
-    user = user_data.get(int(user_id), None)
+@app.route('/vulnerable/user/<user_id>/settings', methods=['GET'])
+def vulnerable_user_settings(user_id):
+    user = user_data.get(int(user_id))
     if user:
-        return jsonify({'user': user}), 200
-    else:
-        return jsonify({'message': 'User not found'}), 404
+        return jsonify({
+            'user_id': user_id,
+            'settings': {
+                'email': user['email'],
+                'ssn': user['ssn'],
+                'credit_card': user['credit_card'],
+                'api_key': user['api_key']
+            }
+        }), 200
+    return jsonify({'error': 'User not found'}), 404
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -99,6 +106,8 @@ def login():
         'success': False,
         'message': 'Invalid credentials'
     }), 401
+
+
 
 if __name__ == '__main__':
     port_number = int(os.getenv('PORT_NUMBER', '5000'))
