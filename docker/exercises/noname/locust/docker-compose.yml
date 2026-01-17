@@ -8,6 +8,7 @@ services:
       - "8089:8089"
     command: >
       sh -c "
+      mkdir -p /mnt/locust &&
       wget https://raw.githubusercontent.com/Sacon217/home-lab/refs/heads/main/docker/exercises/noname/locust/locustfile.py -O /mnt/locust/locustfile.py &&
       python -m locust -f /mnt/locust/locustfile.py --web-host=0.0.0.0
       "
