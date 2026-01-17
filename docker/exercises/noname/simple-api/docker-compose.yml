@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  api:
+  simple-api:
     image: python:3.11-slim
     container_name: simple-api
     restart: always
     working_dir: /app
     ports:
-      - "0.0.0.0:5000:5000"
+      - "0.0.0.0:${PORT_NUMBER}:${PORT_NUMBER}"
     command: |
       sh -c "
       apt-get update &&
