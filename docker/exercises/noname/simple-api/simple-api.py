@@ -70,7 +70,7 @@ def get_user(user_id):
     else:
         return jsonify({'message': 'User not found'}), 404
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get('email')
