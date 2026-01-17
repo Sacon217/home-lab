@@ -5,6 +5,8 @@ services:
     image: python:3.11-slim
     restart: always
     working_dir: /app
+    environment:
+      - PORT_NUMBER=${PORT_NUMBER}
     ports:
       - "0.0.0.0:${PORT_NUMBER}:${PORT_NUMBER}"
     command: |
