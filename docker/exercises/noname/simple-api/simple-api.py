@@ -101,5 +101,6 @@ def login():
     }), 401
 
 if __name__ == '__main__':
-    port_number = int(os.getenv('PORT_NUMBER', 5000))
+    port_number = int(os.getenv('PORT_NUMBER', '5000'))
+    print(f"Starting Flask on port {port_number}")
     app.run(host='0.0.0.0', port=port_number, debug=True)
