@@ -3,7 +3,6 @@ version: '3.8'
 services:
   simple-api:
     image: python:3.11-slim
-    container_name: simple-api
     restart: always
     working_dir: /app
     ports:
