@@ -17,5 +17,5 @@ services:
         
         @task
         def get_home(self):
-            self.client.get("/")
+            self.client.get(\"/\")
       \""
