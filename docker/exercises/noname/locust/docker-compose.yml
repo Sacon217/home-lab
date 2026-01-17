@@ -2,11 +2,12 @@ version: '3.8'
 
 services:
   locust:
-    image: locustio/locust:latest
+    image: python:3.11-slim
     container_name: locust
     restart: always
+    working_dir: /app
     ports:
       - "8089:8089"
     volumes:
-      - ./locustfile.py:/home/locust/locustfile.py
-    command: -f /home/locust/locustfile.py
+      - ./locustfile.py:/app/locustfile.py
+    command: sh -c "pip install locust && locust -f locustfile.py"
