@@ -10,7 +10,9 @@ services:
       - "5000:5000"
     command: |
       sh -c "
-      pip install flask
-      wget https://raw.githubusercontent.com/Sacon217/home-lab/docker/exercises/noname/simple-api/simple-api.py -O /mnt/simple-api/simple-api.py &&
-      python -f /mnt/simple-api/simple-api.py
+      apt-get update &&
+      apt-get install -y wget &&
+      pip install flask &&
+      curl -o /app/simple-api.py https://raw.githubusercontent.com/Sacon217/home-lab/refs/heads/main/docker/exercises/noname/simple-api/simple-api.py &&
+      python /app/simple-api.py
       "
