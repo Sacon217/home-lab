@@ -1,13 +1,16 @@
 version: '3.8'
 
 services:
-  locust:
-    image: python:3.11-slim
-    container_name: locust
-    restart: always
-    working_dir: /app
+  master:
+    image: locustio/locust
     ports:
-      - "8089:8089"
+     - "8089:8089"
     volumes:
-      - ./locustfile.py:/app/locustfile.py
-    command: sh -c "pip install locust && locust -f locustfile.py"
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --master -H http://master:8089
+  
+  worker:
+    image: locustio/locust
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --worker --master-host master
