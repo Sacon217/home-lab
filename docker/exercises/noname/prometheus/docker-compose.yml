@@ -7,7 +7,11 @@ configs:
         - job_name: 'cadvisor'
           scrape_interval: 5s
           static_configs:
-            - targets: [${TARGETS}]
+            - targets: 'cadvisor:8084'
+        - job_name: 'kong'
+          scrape_interval: 5s
+          static_configs:
+            - targets: [kong-gateway:8100]
 
 services:
   prometheus:
