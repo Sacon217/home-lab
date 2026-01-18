@@ -128,7 +128,7 @@ def vulnerable_search():
         }), 200
     except Exception as e:
         conn.close()
-        return jsonify({'error': str(e), 'sql': sql}), 500
+        return jsonify({'error': str(e), 'sql': sql}), 404
 
 @app.route('/login', methods=['POST'])
 def login():
