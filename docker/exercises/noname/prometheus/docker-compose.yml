@@ -1,8 +1,15 @@
 version: '3'
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    command:
+      - "--config.file-/config/"
     volumes:
-      - "./prometheus.yml:/etc/prometheus/prometheus.yml"
+      - prometheus_data:/prometheus
+      - /etc/prometheus:/config/prometheus.yml
     ports:
       - 9090:9090
+volumes:
+  prometheus_data:
+    driver: local
