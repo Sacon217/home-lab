@@ -29,6 +29,8 @@ services:
         mode: 0400      # Required: read-only permissions
     depends_on:
       - cadvisor
+    network_mode: 
+      bridge
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
