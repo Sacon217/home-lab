@@ -1,17 +1,8 @@
 from flask import Flask, jsonify, request
-import hashlib
 import secrets
 import os
 
 app = Flask(__name__)
-
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({'message': 'API is running'}), 200
-
-@app.route('/home', methods=['GET'])
-def home():
-    return jsonify({'message': 'Welcome No Name Security!'}), 200
 
 user_data={
     22: {
@@ -53,6 +44,35 @@ user_data={
 }
 
 active_sessions = {}
+
+def init_db():
+    conn = sqlite3.connect('demo.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS products
+                 (id INTEGER PRIMARY KEY, name TEXT, price REAL, additional_info TEXT)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS users
+                 (id INTEGER PRIMARY KEY, user TEXT, password TEXT)''')
+    
+
+    c.execute("DELETE FROM products")
+    c.execute("DELETE FROM users")
+    
+    c.execute("INSERT INTO products VALUES (1, 'UGREEN NAS', 349.99, 'NAS DXP2800 2-Bay')")
+    c.execute("INSERT INTO products VALUES (2, 'UNMANAGED SWITCH', 59.99, 'TP-Link TL-SG105S-M2')")
+    c.execute("INSERT INTO products VALUES (3, '2x32GB STICKS OF RAM', 10000.50, 'GSKILL DDR5 2x32GB ECC RAM')")
+    c.execute("INSERT INTO users VALUES (1, 'sacon28', '6OzP!CX#Ap')")
+    c.execute("INSERT INTO users VALUES (2, 'admin', '0BE&Xdt^T77orMrgwsUs2O4l%')")
+
+    conn.commit()
+    conn.close()
+
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({'message': 'API is running'}), 200
+
+@app.route('/home', methods=['GET'])
+def home():
+    return jsonify({'message': 'Welcome No Name Security!'}), 200
 
 @app.route('/users', methods=['GET'])
 def get_all_users():
@@ -132,9 +152,8 @@ def login():
         'message': 'Invalid credentials'
     }), 401
 
-
-
 if __name__ == '__main__':
     port_number = int(os.getenv('PORT_NUMBER', '5000'))
+    init_db()
     print(f"Starting Flask on port {port_number}")
     app.run(host='0.0.0.0', port=port_number, debug=True)
