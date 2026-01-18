@@ -84,7 +84,14 @@ def get_all_users():
 
 @app.route('/user/<user_id>/settings', methods=['GET'])
 def get_user_settings(user_id):
-    user = user_data.get(int(user_id))
+    try:
+        user_id_int = int(user_id)
+    except ValueError:
+        return jsonify({'error': 'Invalid user ID format'}), 400
+    
+    if not 0 <= user_id_int <= 100:
+        return jsonify({'error': 'User ID must be between 0 and 100'}), 400
+        
     if user:
         return jsonify({
             'user_id': user_id,
