@@ -4,7 +4,7 @@ services:
     image: prom/prometheus:latest
     restart: unless-stopped
     command:
-      - "--config.file-/config/prometheus.yml"
+      - "--config.file=/config/prometheus.yml"
     volumes:
       - prometheus_data:/prometheus
       - /etc/prometheus:/config/prometheus.yml
