@@ -77,15 +77,14 @@ def home():
 
 @app.route('/users', methods=['GET'])
 def get_all_users():
-    all_users = {str(user_id): user_data[user_id] for user_id in user_data}
     return jsonify({
         'total_users': len(user_data),
-        'users': all_users
+        'users': user_data
     }), 200
 
 @app.route('/user/<user_id>/settings', methods=['GET'])
 def get_user_settings(user_id):
-    user = user_data.get(user_id)
+    user = user_data.get(int(user_id))
     if user:
         return jsonify({
             'user_id': user_id,
