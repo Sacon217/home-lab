@@ -91,10 +91,11 @@ def get_user_settings(user_id):
     
     if not 0 <= user_id_int <= 100:
         return jsonify({'error': 'User ID must be between 0 and 100'}), 400
-        
+    
+    user = user_data.get(user_id_int)
     if user:
         return jsonify({
-            'user_id': user_id,
+            'user_id': str(user_id_int),
             'settings': {
                 'email': user['email'],
                 'ssn': user['ssn'],
