@@ -31,6 +31,7 @@ services:
     container_name: cadvisor
     ports:
       - 8084:8084
+    command: - --port=8084
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:rw
