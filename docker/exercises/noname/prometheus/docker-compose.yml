@@ -1,15 +1,46 @@
-version: '3'
+version: '3.8'
+
+configs:
+  prometheus_config:
+    content: |
+      scrape_configs:
+        - job_name: 'cadvisor'
+          scrape_interval: 5s
+          static_configs:
+            - targets: [[${TARGETS}]]
+
 services:
   prometheus:
     image: prom/prometheus:latest
-    restart: unless-stopped
-    command:
-      - "--config.file=/config/prometheus.yml"
-    volumes:
-      - prometheus_data:/prometheus
-      - /etc/prometheus:/config/prometheus.yml
+    container_name: prometheus
     ports:
       - 9090:9090
-volumes:
-  prometheus_data:
-    driver: local
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+        uid: "65534"    # Required: numeric UID for 'nobody' user
+        gid: "65534"    # Required: numeric GID for 'nobody' group
+        mode: 0400      # Required: read-only permissions
+    depends_on:
+      - cadvisor
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - 8084:8084
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6379:6379
