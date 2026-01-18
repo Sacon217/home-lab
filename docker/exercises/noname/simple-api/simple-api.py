@@ -62,9 +62,9 @@ def get_all_users():
         'users': all_users
     }), 200
 
-@app.route('/vulnerable/user/<user_id>/settings', methods=['GET'])
-def vulnerable_user_settings(user_id):
-    user = user_data.get(int(user_id))
+@app.route('/user/<user_id>/settings', methods=['GET'])
+def get_user_settings(user_id):
+    user = user_data.get(user_id)
     if user:
         return jsonify({
             'user_id': user_id,
@@ -76,6 +76,31 @@ def vulnerable_user_settings(user_id):
             }
         }), 200
     return jsonify({'error': 'User not found'}), 404
+
+@app.route('/db/restart', methods=['GET'])
+def restart_db():
+    init_db()
+    return jsonify({'message': 'Database restarted'}), 200
+
+@app.route('/db/search', methods=['GET'])
+def vulnerable_search():
+    search_query = request.args.get('query', '')
+    
+    conn = sqlite3.connect('demo.db')
+    c = conn.cursor()
+    sql = f"SELECT id, name, price, additional_info FROM products WHERE name LIKE '%{search_query}%'"
+    
+    try:
+        c.execute(sql)
+        results = c.fetchall()
+        conn.close()
+        
+        return jsonify({
+            'results': [{'id': r[0], 'name': r[1], 'price': r[2], 'info': r[3]} for r in results]
+        }), 200
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e), 'sql': sql}), 500
 
 @app.route('/login', methods=['POST'])
 def login():
