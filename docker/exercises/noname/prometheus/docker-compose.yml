@@ -9,10 +9,9 @@ configs:
           static_configs:
             - targets: ['cadvisor:8084']
         - job_name: 'kong'
-          scrape_interval: 30s
-          scrape_timeout: 25s
+          scrape_interval: 5s
           static_configs:
-            - targets: ['192.168.100.62:8100']
+            - targets: ['kong-gateway:8100']
 
 services:
   prometheus:
