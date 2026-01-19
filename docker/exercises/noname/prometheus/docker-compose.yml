@@ -7,16 +7,18 @@ configs:
         - job_name: 'cadvisor'
           scrape_interval: 5s
           static_configs:
-            - targets: ['cadvisor:8084']
+            - targets: ['cadvisor.nonamesec.org']
         - job_name: 'kong'
           scrape_interval: 5s
           static_configs:
-            - targets: ['192.168.100.62:8100']
+            - targets: ['kong-metris.nonamesec.org']
 
 services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
+    dns:
+      - 192.168.100.52
     ports:
       - 9090:9090
     command:
