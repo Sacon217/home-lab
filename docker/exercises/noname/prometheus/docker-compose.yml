@@ -8,7 +8,7 @@ configs:
           scrape_interval: 15s
           scrape_timeout: 10s
           static_configs:
-            - targets: ['192.168.100.62:8084']
+            - targets: ['cadvisor:8084']
         - job_name: 'kong'
           scrape_interval: 15s
           scrape_timeout: 10s
@@ -19,7 +19,6 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    network_mode: bridge
     ports:
       - 9090:9090
     command:
@@ -36,7 +35,6 @@ services:
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: cadvisor
-    network_mode: bridge
     ports:
       - 8084:8084
     command: 
@@ -52,6 +50,5 @@ services:
   redis:
     image: redis:latest
     container_name: redis
-    network_mode: bridge
     ports:
       - 6379:6379
