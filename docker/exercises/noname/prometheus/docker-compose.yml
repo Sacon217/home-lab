@@ -9,8 +9,8 @@ configs:
           static_configs:
             - targets: ['cadvisor:8084']
         - job_name: 'kong'
-          scrape_interval: 5s
-          scrape_timeout: 60s
+          scrape_interval: 30s
+          scrape_timeout: 25s
           static_configs:
             - targets: ['192.168.100.62:8100']
 
