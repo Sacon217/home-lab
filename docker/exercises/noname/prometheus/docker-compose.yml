@@ -11,7 +11,7 @@ configs:
         - job_name: 'kong'
           scrape_interval: 5s
           static_configs:
-            - targets: ['kong-gateway:8100']
+            - targets: ['192.168.100.62:8100']
 
 services:
   prometheus:
