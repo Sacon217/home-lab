@@ -5,6 +5,8 @@ import sqlite3
 
 app = Flask(__name__)
 
+port_number = int(os.getenv('PORT_NUMBER'))
+
 user_data={
     22: {
         'identification': "1-0021-1234", 
@@ -43,8 +45,6 @@ user_data={
         'api_key': 'sk_live_qrstuvwxyz123456'
     }
 }
-
-active_sessions = {}
 
 def init_db():
     conn = sqlite3.connect('demo.db')
@@ -94,6 +94,17 @@ def get_user_settings(user_id):
     
     user = user_data.get(user_id_int)
     if user:
+        if port_number == 5001:
+
+            return jsonify({
+            'user_id': str(user_id_int),
+            'settings': {
+                'email': user['email'],
+                'name': user['name'],
+                'identification': user['identification'], 
+                }
+            }), 200
+
         return jsonify({
             'user_id': str(user_id_int),
             'settings': {
@@ -116,10 +127,19 @@ def vulnerable_search():
     
     conn = sqlite3.connect('demo.db')
     c = conn.cursor()
-    sql = f"SELECT id, name, price, additional_info FROM products WHERE name LIKE '%{search_query}%'"
     
     try:
-        c.execute(sql)
+
+        if port_number == 5001:
+            
+            sql = "SELECT id, name, price, additional_info FROM products WHERE name LIKE ?"
+            search_param = f'%{search_query}%'
+            c.execute(sql, (search_param,))
+
+        else:
+            sql = f"SELECT id, name, price, additional_info FROM products WHERE name LIKE '%{search_query}%'"
+            c.execute(sql)
+
         results = c.fetchall()
         conn.close()
         
@@ -128,7 +148,12 @@ def vulnerable_search():
         }), 200
     except Exception as e:
         conn.close()
+
+        if port_number == 5001:
+            return jsonify({'error': 'Search failed'}), 500
+
         return jsonify({'error': str(e), 'sql': sql}), 500
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -139,12 +164,7 @@ def login():
     for user_id, user in user_data.items():
         if user['email'] == email and user['password'] == password:
             session_token = secrets.token_hex(32)
-            active_sessions[session_token] = {
-                'user_id': user_id,
-                'email': email,
-                'name': user['name']
-            }
-            
+    
             return jsonify({
                 'success': True,
                 'message': 'Login successful',
@@ -161,7 +181,6 @@ def login():
     }), 401
 
 if __name__ == '__main__':
-    port_number = int(os.getenv('PORT_NUMBER', '5000'))
     init_db()
     print(f"Starting Flask on port {port_number}")
     app.run(host='0.0.0.0', port=port_number, debug=True)
