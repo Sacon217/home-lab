@@ -8,10 +8,6 @@ configs:
           scrape_interval: 5s
           static_configs:
             - targets: ['cadvisor.nonamesec.org']
-        - job_name: 'kong'
-          scrape_interval: 5s
-          static_configs:
-            - targets: ['kong-metris.nonamesec.org']
 
 services:
   prometheus:

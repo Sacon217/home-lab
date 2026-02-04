@@ -7,3 +7,4 @@ class APIUser(HttpUser):
     def get_home(self):
         self.client.get("/")
 
+locust -f locustfile.py --host=http://kong.nonamesec.org                                                                                                                   
