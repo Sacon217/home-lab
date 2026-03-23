@@ -1,14 +1,10 @@
-networks:
-  n8n_network:
-    external: true
-
 services:
   n8n:
     image: n8nio/n8n:latest
     container_name: n8n
     restart: unless-stopped
     networks:
-      - n8n_network
+      - bridge
     ports:
       - "127.0.0.1:${PORT}:${PORT}"
     environment:

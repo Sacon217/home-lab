@@ -1,12 +1,8 @@
-networks:
-  n8n_network:
-    external: true
-
 services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
     restart: unless-stopped
     networks:
-      - n8n_network
+      - bridge
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
