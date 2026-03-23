@@ -17,5 +17,6 @@ services:
       - N8N_PROTOCOL=https
       - WEBHOOK_URL=https://${HOST}/
       - GENERIC_TIMEZONE=America/Costa_Rica
+      - N8N_EDITOR_BASE_URL=https://${HOST}
     volumes:
       - /opt/n8n/data:/home/node/.n8n
