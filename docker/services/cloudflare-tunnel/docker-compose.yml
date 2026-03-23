@@ -8,5 +8,5 @@ services:
     container_name: cloudflared
     restart: unless-stopped
     networks:
-      - bridge
+      - n8n_network
     command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
