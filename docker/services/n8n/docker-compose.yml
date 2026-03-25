@@ -25,7 +25,7 @@ services:
       - /opt/n8n/data:/home/node/.n8n
       
   n8n-task-runner:
-    image: n8nio/n8n-task-runners:latest
+    image: n8nio/runners:latest
     container_name: n8n-task-runner
     restart: unless-stopped
     networks:
