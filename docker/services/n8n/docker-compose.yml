@@ -20,7 +20,6 @@ services:
       - GENERIC_TIMEZONE=America/Costa_Rica
       - N8N_EDITOR_BASE_URL=https://${HOST}
       - N8N_RUNNERS_BROKER_LISTEN_ADDRESS=0.0.0.0
-      - NODE_FUNCTION_ALLOW_EXTERNAL=re,os,json,math
       - N8N_RUNNERS_ENABLED=true
       - N8N_RUNNERS_MODE=external
       - N8N_RUNNERS_AUTH_TOKEN=${RUNNER_AUTH_TOKEN}
@@ -36,3 +35,9 @@ services:
     environment:
       - N8N_RUNNERS_AUTH_TOKEN=${RUNNER_AUTH_TOKEN}
       - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:${PORT2}
+      - N8N_RUNNERS_STDLIB_ALLOW=*
+      - N8N_RUNNERS_EXTERNAL_ALLOW=*
+    volumes:
+      - /opt/n8n/n8n-task-runners.json:/etc/n8n-task-runners.json
+    depends_on:
+      - n8n
