@@ -18,5 +18,18 @@ services:
       - WEBHOOK_URL=https://${HOST}/
       - GENERIC_TIMEZONE=America/Costa_Rica
       - N8N_EDITOR_BASE_URL=https://${HOST}
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_RUNNERS_MODE=external
+      - N8N_RUNNERS_AUTH_TOKEN=${RUNNER_AUTH_TOKEN}
     volumes:
       - /opt/n8n/data:/home/node/.n8n
+      
+  n8n-task-runner:
+    image: n8nio/n8n-task-runners:latest
+    container_name: n8n-task-runner
+    restart: unless-stopped
+    networks:
+      - n8n_network
+    environment:
+      - N8N_RUNNERS_AUTH_TOKEN=${RUNNER_AUTH_TOKEN}
+      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:5679
