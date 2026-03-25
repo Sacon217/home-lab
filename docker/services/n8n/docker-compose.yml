@@ -10,10 +10,11 @@ services:
     networks:
       - n8n_network
     ports:
-      - "0.0.0.0:${PORT}:${PORT}"
+      - "0.0.0.0:${PORT1}:${PORT1}"
+      - "0.0.0.0:${PORT2}:${PORT2}"
     environment:
       - N8N_HOST=${HOST}
-      - N8N_PORT=${PORT}
+      - N8N_PORT=${PORT1}
       - N8N_PROTOCOL=https
       - WEBHOOK_URL=https://${HOST}/
       - GENERIC_TIMEZONE=America/Costa_Rica
@@ -32,4 +33,4 @@ services:
       - n8n_network
     environment:
       - N8N_RUNNERS_AUTH_TOKEN=${RUNNER_AUTH_TOKEN}
-      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:${PORT}
+      - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:${PORT2}
