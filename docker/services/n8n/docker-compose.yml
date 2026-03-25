@@ -37,7 +37,5 @@ services:
       - N8N_RUNNERS_TASK_BROKER_URI=http://n8n:${PORT2}
       - N8N_RUNNERS_STDLIB_ALLOW=*
       - N8N_RUNNERS_EXTERNAL_ALLOW=*
-    volumes:
-      - /opt/n8n/n8n-task-runners.json:/etc/n8n-task-runners.json
     depends_on:
       - n8n
