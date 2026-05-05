@@ -1,6 +1,5 @@
 networks:
-  n8n_network:
-    external: true
+    driver: bridge
 
 services:
   n8n:
@@ -40,3 +39,11 @@ services:
       - /opt/n8n/n8n-task-runners.json:/etc/n8n-task-runners.json
     depends_on:
       - n8n
+      
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - n8n_network
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}

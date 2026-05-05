@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: finance-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: finance
+      POSTGRES_DB: finance
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - finance_db
+
+  finance-api:
+    image: python:3.12-slim
+    container_name: finance-api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://finance:${POSTGRES_PASSWORD}@postgres:5432/finance
+    command: >
+      sh -c "pip install --no-cache-dir fastapi uvicorn sqlalchemy psycopg2-binary &&
+             echo 'from fastapi import FastAPI; app = FastAPI()' > /tmp/stub.py &&
+             uvicorn /tmp.stub:app --host 0.0.0.0 --port 8000"
+    networks:
+      - finance_db
+      - n8n_network
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+
+networks:
+  finance_db:
+    driver: bridge
+    internal: true
+
+  n8n_network:
+    external: true
