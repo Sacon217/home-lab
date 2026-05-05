@@ -1,6 +1,7 @@
 networks:
   n8n_network:
     driver: bridge
+    name: n8n_network
 
 services:
   n8n:

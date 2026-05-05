@@ -36,6 +36,7 @@ networks:
   finance_db:
     driver: bridge
     internal: true
+    name: finance_db
 
   n8n_network:
     external: true
