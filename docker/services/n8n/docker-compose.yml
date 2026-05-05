@@ -1,4 +1,5 @@
 networks:
+  n8n_network:
     driver: bridge
 
 services:
@@ -39,7 +40,7 @@ services:
       - /opt/n8n/n8n-task-runners.json:/etc/n8n-task-runners.json
     depends_on:
       - n8n
-      
+
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared
