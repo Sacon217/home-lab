@@ -1,0 +1,29 @@
+name: build-finance-parser
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/finance-automation/parser/**'
+      - '.github/workflows/build-finance-parser.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./projects/finance-automation/parser
+          push: true
+          tags: |
+            ghcr.io/sacon217/finance-parser:latest
+            ghcr.io/sacon217/finance-parser:${{ github.sha }}
