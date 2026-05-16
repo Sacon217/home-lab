@@ -21,6 +21,7 @@ services:
       - CODE_ENABLE_STDOUT=true
       - N8N_EDITOR_BASE_URL=https://${HOST}
       - N8N_BETA_FEATURES_ENABLED=1
+      - N8N_MCP_ACCESS_ENABLED=true
     volumes:
       - /opt/n8n/data:/home/node/.n8n
       
