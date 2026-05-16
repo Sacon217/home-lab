@@ -1,0 +1,17 @@
+services:
+  finance-parser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finance-parser
+    restart: unless-stopped
+    environment:
+      BANK_CARDS: ${BANK_CARDS}
+    ports:
+      - "8000:8000"
+    networks:
+      - n8n_network
+
+networks:
+  n8n_network:
+    external: true
