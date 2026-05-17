@@ -10,9 +10,8 @@ services:
     restart: unless-stopped
     networks:
       - n8n_network
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
+    extra_hosts:
+      - "gmail.googleapis.com:142.251.34.138"
     ports:
       - "0.0.0.0:${PORT1}:${PORT1}"
     environment:
