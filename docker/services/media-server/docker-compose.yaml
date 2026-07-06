@@ -90,6 +90,22 @@ services:
       yams_network:
         ipv4_address: 172.60.0.15
 
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+    volumes:
+      - ${INSTALL_DIRECTORY}/config/jellyseerr:/app/config
+    ports:
+      - ${JELLYSEERR_PORT}:{JELLYSEERR_PORT}
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.20
+
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
     container_name: bazarr
