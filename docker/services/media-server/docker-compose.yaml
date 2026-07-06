@@ -100,7 +100,7 @@ services:
     volumes:
       - ${INSTALL_DIRECTORY}/config/jellyseerr:/app/config
     ports:
-      - ${JELLYSEERR_PORT}:{JELLYSEERR_PORT}
+      - ${JELLYSEERR_PORT}:${JELLYSEERR_PORT}
     restart: unless-stopped
     networks:
       yams_network:
