@@ -14,6 +14,9 @@ services:
     ports:
       - ${JELLYFIN_PORT}:${JELLYFIN_PORT}
     restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.19
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
