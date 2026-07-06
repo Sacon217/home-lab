@@ -122,6 +122,14 @@ services:
       yams_network:
         ipv4_address: 172.60.0.17
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    networks:
+      - yams_network
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    
 networks:
   yams_network:
     name: yams_network
