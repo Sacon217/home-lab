@@ -1,0 +1,130 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/${MEDIA_SERVICE}:latest
+    container_name: ${MEDIA_SERVICE}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+      - VERSION=docker
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/${MEDIA_SERVICE}:/config
+    ports:
+      - ${JELLYFIN_PORT}:${JELLYFIN_PORT}
+    restart: unless-stopped
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/sabnzbd:/config
+    ports:
+      - ${SABNZBD_PORT}:${SABNZBD_PORT}
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.18
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/sonarr:/config
+    ports:
+      - ${SONARR_PORT}:${SONARR_PORT}
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.13
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/radarr:/config
+    ports:
+      - ${RADARR_PORT}:${RADARR_PORT}
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.14
+
+  lidarr:
+    image: lscr.io/linuxserver/lidarr:latest
+    container_name: lidarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/lidarr:/config
+    ports:
+      - ${LIDARR_PORT}:${LIDARR_PORT}
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.15
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${MEDIA_DIRECTORY}:/data
+      - ${INSTALL_DIRECTORY}/config/bazarr:/config
+    ports:
+      - ${BAZARR_PORT}:${BAZARR_PORT}
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.16
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ:-America/Costa_Rica}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${INSTALL_DIRECTORY}/config/prowlarr:/config
+    ports:
+      - ${PROWLARR_PORT}:${PROWLARR_PORT}
+    restart: unless-stopped
+    networks:
+      yams_network:
+        ipv4_address: 172.60.0.17
+
+networks:
+  yams_network:
+    name: yams_network
+    ipam:
+      config:
+        - subnet: 172.60.0.0/24
