@@ -1,69 +1,69 @@
-version: "3.9"
-
-networks:
-  private:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-  edge:
-    driver: bridge
-
-services:
-  pihole:
-    image: pihole/pihole:latest
-    container_name: pihole
-    restart: unless-stopped
-    networks:
-      private:
-        ipv4_address: 172.20.0.2
-    ports:
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "192.168.100.52:8080:80/tcp"
-      - "192.168.100.52:8443:443/tcp"
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    environment:
-      TZ: "America/Costa_Rica"
-      FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
-      FTLCONF_dns_listeningMode: "all"
-      PIHOLE_DNS_: "1.1.1.1;1.0.0.1"
-    volumes:
-      - "/srv/docker/pihole/etc-pihole:/etc/pihole"
-      - "/srv/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
-    healthcheck:
-      test: ["CMD-SHELL", "dig +short @127.0.0.1 pi.hole || exit 1"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  npm:
-    image: jc21/nginx-proxy-manager:latest
-    container_name: npm
-    depends_on: [pihole]
-    networks:
-      edge:
-      private:
-        ipv4_address: 172.20.0.3
-    environment:
-      TZ: "America/Costa_Rica"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "192.168.100.52:81:81"
-    volumes:
-      - "/srv/docker/npm/data:/data"
-      - "/srv/docker/npm/letsencrypt:/etc/letsencrypt"
-    restart: unless-stopped
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+  version: "3.9"
+  
+  networks:
+    private:
+      driver: bridge
+      ipam:
+        config:
+          - subnet: 172.20.0.0/16
+    edge:
+      driver: bridge
+  
+  services:
+    pihole:
+      image: pihole/pihole:latest
+      container_name: pihole
+      restart: unless-stopped
+      networks:
+        private:
+          ipv4_address: 172.20.0.2
+      ports:
+        - "53:53/tcp"
+        - "53:53/udp"
+        - "8080:80/tcp"
+        - "8443:443/tcp"
+      cap_add:
+        - NET_ADMIN
+        - NET_RAW
+      environment:
+        TZ: "America/Costa_Rica"
+        FTLCONF_webserver_api_password: "${PIHOLE_PASSWORD}"
+        FTLCONF_dns_listeningMode: "all"
+        PIHOLE_DNS_: "1.1.1.1;1.0.0.1"
+      volumes:
+        - "/srv/docker/pihole/etc-pihole:/etc/pihole"
+        - "/srv/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d"
+      healthcheck:
+        test: ["CMD-SHELL", "dig +short @127.0.0.1 pi.hole || exit 1"]
+        interval: 30s
+        timeout: 5s
+        retries: 3
+      logging:
+        driver: json-file
+        options:
+          max-size: "10m"
+          max-file: "3"
+  
+    npm:
+      image: jc21/nginx-proxy-manager:latest
+      container_name: npm
+      depends_on: [pihole]
+      networks:
+        edge:
+        private:
+          ipv4_address: 172.20.0.3
+      environment:
+        TZ: "America/Costa_Rica"
+      ports:
+        - "80:80"
+        - "443:443"
+        - "81:81"
+      volumes:
+        - "/srv/docker/npm/data:/data"
+        - "/srv/docker/npm/letsencrypt:/etc/letsencrypt"
+      restart: unless-stopped
+      logging:
+        driver: json-file
+        options:
+          max-size: "10m"
+          max-file: "3"
