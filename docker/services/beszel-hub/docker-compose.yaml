@@ -3,6 +3,8 @@ services:
     image: henrygd/beszel:latest
     container_name: beszel
     restart: unless-stopped
+    networks:
+      - home-lab-network
     environment:
       APP_URL: ${BESZEL_HUB}
     ports:
@@ -15,3 +17,8 @@ services:
       interval: 120s
       start_period: 10s
       timeout: 5s
+
+networks:
+  home-lab-network:
+    external: true
+    name: home-lab-services_edge
