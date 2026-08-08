@@ -8,4 +8,4 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       PORT: 45876
-      KEY: "${PIHOLE_PASSWORD}"
+      KEY: "${BESZEL_TOKEN}"
