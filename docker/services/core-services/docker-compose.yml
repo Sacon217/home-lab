@@ -69,27 +69,27 @@
           max-file: "3"
     
     beszel:
-    image: henrygd/beszel:latest
-    container_name: beszel
-    restart: unless-stopped
-    depends_on: [npm]
-    networks:
-      - edge
-    environment:
-      TZ: "America/Costa_Rica"
-      APP_URL: ${BESZEL_HUB}
-    ports:
-      - 8090:8090
-    volumes:
-      - "/srv/docker/beszel/beszel_data:/beszel_data"
-      - "/srv/docker/beszel/beszel_socket:/beszel_socket"
-    healthcheck:
-      test: ['CMD', '/beszel', 'health', '--url', '${BESZEL_HUB}']
-      interval: 120s
-      start_period: 10s
-      timeout: 5s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
+      image: henrygd/beszel:latest
+      container_name: beszel
+      restart: unless-stopped
+      depends_on: [npm]
+      networks:
+        - edge
+      environment:
+        TZ: "America/Costa_Rica"
+        APP_URL: ${BESZEL_HUB}
+      ports:
+        - 8090:8090
+      volumes:
+        - "/srv/docker/beszel/beszel_data:/beszel_data"
+        - "/srv/docker/beszel/beszel_socket:/beszel_socket"
+      healthcheck:
+        test: ['CMD', '/beszel', 'health', '--url', '${BESZEL_HUB}']
+        interval: 120s
+        start_period: 10s
+        timeout: 5s
+      logging:
+        driver: json-file
+        options:
+          max-size: "10m"
+          max-file: "3"
