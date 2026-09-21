@@ -1,0 +1,17 @@
+services:
+  issues-board:
+    image: ghcr.io/sacon217/issues-board:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: issues-board
+    restart: unless-stopped
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      GITHUB_REPO: ${GITHUB_REPO}
+      BOARD_TITLE: ${BOARD_TITLE}
+      BOARD_APPS: ${BOARD_APPS}
+      BOARD_ASSIGNEES: ${BOARD_ASSIGNEES}
+      BOARD_DEFAULT_ASSIGNEE: ${BOARD_DEFAULT_ASSIGNEE}
+    ports:
+      - "8010:8000"
