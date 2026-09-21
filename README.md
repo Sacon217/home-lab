@@ -8,6 +8,9 @@ Personal infrastructure and security projects running on a two-node home lab
 - **[API Gateway Security Lab](./projects/api-gateway-security/)** — Self-hosted API 
   security environment using Kong Gateway, Prometheus, Grafana, and Locust to demonstrate 
   OWASP API Top 10 vulnerabilities across secure and insecure API routes.
+- **[Taisa Board](./projects/taisa-tablero/)** — FastAPI service that serves a live board 
+  of the open issues in the Taisa tracker, classified by app, readiness and priority from 
+  their GitHub labels.
 
 ## Services
 

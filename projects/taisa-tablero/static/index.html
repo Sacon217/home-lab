@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablero de issues Taisa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;600&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg:#F1F2F5; --surface:#FFFFFF; --surface-2:#F8F9FB; --sunken:#E9EBEF;
+  --ink:#14161A; --ink-2:#3C4350; --muted:#5C6676; --line:#DCE0E6; --line-2:#C9CFD8;
+  --accent:#2E4C9B;
+  --listo:#157F3B; --listo-soft:#DCEFE2;
+  --falta:#B45309; --falta-soft:#F7E8D4;
+  --p-critico:#B42318; --p-alto:#B54708; --p-medio:#1A4FB0; --p-bajo:#5C6676;
+  --api:#2E5EAA; --web:#6D4AAE; --tiendita:#0F766E;
+  --display:"Bricolage Grotesque","Trebuchet MS",sans-serif;
+  --body:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0F1115; --surface:#181B21; --surface-2:#1D2129; --sunken:#14171C;
+    --ink:#E9EBEF; --ink-2:#C2C8D2; --muted:#98A1B0; --line:#2A2F39; --line-2:#39404C;
+    --accent:#8FA8EC;
+    --listo:#5FC482; --listo-soft:#17301F;
+    --falta:#E0A55C; --falta-soft:#322415;
+    --p-critico:#F2837A; --p-alto:#E7A164; --p-medio:#84A6EE; --p-bajo:#98A1B0;
+    --api:#84A6EE; --web:#B490E8; --tiendita:#4FC3AC;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:#0F1115; --surface:#181B21; --surface-2:#1D2129; --sunken:#14171C;
+  --ink:#E9EBEF; --ink-2:#C2C8D2; --muted:#98A1B0; --line:#2A2F39; --line-2:#39404C;
+  --accent:#8FA8EC;
+  --listo:#5FC482; --listo-soft:#17301F;
+  --falta:#E0A55C; --falta-soft:#322415;
+  --p-critico:#F2837A; --p-alto:#E7A164; --p-medio:#84A6EE; --p-bajo:#98A1B0;
+  --api:#84A6EE; --web:#B490E8; --tiendita:#4FC3AC;
+}
+
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1180px; margin:0 auto; padding-inline:16px; padding-block:36px 64px; }
+h1,h2,h3,h4 { font-family:var(--display); margin:0; text-wrap:balance; letter-spacing:-.015em; }
+a { color:inherit; }
+
+.eyebrow { font-family:var(--mono); font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--muted); margin:0 0 10px; }
+h1 { font-size:clamp(27px,5vw,40px); font-weight:700; line-height:1.08; }
+.lede { max-width:62ch; color:var(--ink-2); margin:12px 0 0; font-size:15.5px; }
+
+.estado { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:22px 0 0; padding:12px 14px; background:var(--surface); border:1px solid var(--line); border-radius:9px; font-size:13px; }
+.latido { width:8px; height:8px; border-radius:50%; background:var(--muted); flex:none; }
+.latido.vivo { background:var(--listo); }
+.latido.frio { background:var(--falta); }
+.estado .sep { color:var(--line-2); }
+.estado b { font-family:var(--mono); font-weight:600; }
+#estado-texto { flex:1 1 14em; min-width:0; }
+.refrescar { margin-left:auto; font:inherit; font-size:13px; padding:5px 12px; border-radius:999px; border:1px solid var(--line-2); background:var(--surface-2); color:var(--ink); cursor:pointer; }
+.refrescar:hover { border-color:var(--muted); }
+.refrescar:disabled { cursor:progress; opacity:.6; }
+.refrescar:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+.tally { display:flex; flex-wrap:wrap; gap:6px 26px; margin:22px 0 0; padding:0; list-style:none; }
+.tally li { display:flex; align-items:baseline; gap:7px; }
+.tally .num { font-family:var(--mono); font-size:21px; font-weight:600; letter-spacing:-.02em; }
+.tally .lab { font-size:13px; color:var(--muted); }
+
+.filters { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:26px 0 18px; }
+.flabel { font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-right:2px; }
+.chip { font:inherit; font-size:13px; padding:5px 12px; border-radius:999px; border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2); cursor:pointer; transition:background .12s,color .12s,border-color .12s; }
+.chip:hover { border-color:var(--muted); }
+.chip[aria-pressed="true"] { background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.chip:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.sep-v { width:1px; height:20px; background:var(--line-2); margin-inline:6px; }
+
+.board { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; align-items:start; }
+.col { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 14px 14px; min-width:0; }
+.col-head { display:flex; align-items:center; gap:8px; }
+.col-head h3 { font-family:var(--mono); font-size:13px; font-weight:600; letter-spacing:0; flex:1; min-width:0; overflow-wrap:anywhere; }
+.col-count { font-family:var(--mono); font-size:12px; color:var(--muted); }
+.col-count b { color:var(--ink); }
+.col-desc { margin:6px 0 16px; font-size:12px; color:var(--muted); }
+.dot { width:8px; height:8px; border-radius:50%; flex:none; display:inline-block; }
+.dot-api { background:var(--api); } .dot-web { background:var(--web); } .dot-tiendita { background:var(--tiendita); }
+.group + .group { margin-top:18px; }
+.group-head { display:flex; align-items:center; gap:7px; font-family:var(--body); font-size:12px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; }
+.group-n { font-family:var(--mono); font-weight:400; }
+.pip { width:9px; height:9px; border-radius:2px; display:inline-block; flex:none; }
+.pip-listo { background:var(--listo); }
+.pip-falta { background:var(--falta-soft); border:1px solid var(--falta); }
+.cards { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px; }
+.card { position:relative; background:var(--surface-2); border:1px solid var(--line); border-radius:7px; }
+.card::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:7px 0 0 7px; background:var(--prio); }
+.card a.card-link { display:block; padding:9px 10px 9px 13px; text-decoration:none; color:inherit; border-radius:7px; }
+.card a.card-link:hover { background:var(--sunken); }
+.card a.card-link:focus-visible { outline:2px solid var(--accent); outline-offset:1px; }
+.card-top { display:flex; align-items:baseline; gap:7px; margin-bottom:3px; flex-wrap:wrap; }
+.num { font-family:var(--mono); font-size:11.5px; font-weight:600; color:var(--muted); }
+.tag { font-family:var(--mono); font-size:10px; letter-spacing:.04em; text-transform:uppercase; padding:1px 5px; border-radius:3px; border:1px solid var(--line-2); color:var(--muted); }
+.tag-go { color:var(--accent); border-color:var(--accent); }
+.tag-cruza { color:var(--ink-2); background:var(--sunken); border-color:transparent; }
+.card-t { font-size:13px; line-height:1.42; color:var(--ink); }
+.card-foot { margin-top:6px; display:flex; gap:6px; flex-wrap:wrap; font-size:11px; color:var(--muted); }
+.who { font-family:var(--mono); font-size:10.5px; }
+.empty { font-size:12px; color:var(--muted); font-style:italic; padding:6px 0; }
+
+footer { margin-top:44px; padding-top:18px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted); max-width:70ch; }
+footer code { font-family:var(--mono); font-size:11.5px; background:var(--sunken); padding:1px 5px; border-radius:3px; }
+
+@media (max-width:880px) { .board { grid-template-columns:1fr; } }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Sacon217/taisa-issues</p>
+  <h1>Tablero de issues Taisa</h1>
+  <p class="lede">Los issues abiertos repartidos por app, y dentro de cada una lo que se puede empezar hoy separado de lo que todavía espera que alguien elija algo.</p>
+
+  <div class="estado" id="estado">
+    <span class="latido" id="latido"></span>
+    <span id="estado-texto">Leyendo el tracker…</span>
+    <button class="refrescar" id="refrescar" type="button">Refrescar</button>
+  </div>
+
+  <ul class="tally" id="tally" hidden>
+    <li><span class="num" id="n-listo" style="color:var(--listo)">—</span><span class="lab">listo para empezar</span></li>
+    <li><span class="num" id="n-falta" style="color:var(--falta)">—</span><span class="lab">falta definir</span></li>
+    <li><span class="num" id="n-cruza">—</span><span class="lab">cruzan API y web</span></li>
+    <li><span class="num" id="n-agente">—</span><span class="lab">los puede tomar un agente</span></li>
+  </ul>
+
+  <div class="filters">
+    <span class="flabel">App</span>
+    <button class="chip" data-f="app" data-v="api" aria-pressed="false">API</button>
+    <button class="chip" data-f="app" data-v="web" aria-pressed="false">Web</button>
+    <button class="chip" data-f="app" data-v="tiendita" aria-pressed="false">Tiendita</button>
+    <span class="sep-v" aria-hidden="true"></span>
+    <span class="flabel">Tipo</span>
+    <button class="chip" data-f="tipo" data-v="bug" aria-pressed="false">Defecto</button>
+    <button class="chip" data-f="tipo" data-v="deuda" aria-pressed="false">Deuda</button>
+    <button class="chip" data-f="tipo" data-v="decision" aria-pressed="false">Decisión</button>
+    <button class="chip" data-f="tipo" data-v="tarea" aria-pressed="false">Tarea</button>
+    <button class="chip" data-f="tipo" data-v="indice" aria-pressed="false">Índice</button>
+    <span class="sep-v" aria-hidden="true"></span>
+    <span class="flabel">Prioridad</span>
+    <button class="chip" data-f="prio" data-v="critico" aria-pressed="false">Crítico</button>
+    <button class="chip" data-f="prio" data-v="alto" aria-pressed="false">Alto</button>
+  </div>
+
+  <div class="board">
+    <section class="col" data-col="api">
+      <header class="col-head"><span class="dot dot-api"></span><h3>sistema-taisa-api</h3><span class="col-count"><b>—</b></span></header>
+      <p class="col-desc">El backend del ERP</p>
+      <div class="group"><h4 class="group-head"><span class="pip pip-listo"></span>Listo <span class="group-n">—</span></h4><ul class="cards" id="listo-api"></ul></div>
+      <div class="group"><h4 class="group-head"><span class="pip pip-falta"></span>Falta definir <span class="group-n">—</span></h4><ul class="cards" id="falta-api"></ul></div>
+    </section>
+    <section class="col" data-col="web">
+      <header class="col-head"><span class="dot dot-web"></span><h3>sistema-taisa-web</h3><span class="col-count"><b>—</b></span></header>
+      <p class="col-desc">El frontend del ERP</p>
+      <div class="group"><h4 class="group-head"><span class="pip pip-listo"></span>Listo <span class="group-n">—</span></h4><ul class="cards" id="listo-web"></ul></div>
+      <div class="group"><h4 class="group-head"><span class="pip pip-falta"></span>Falta definir <span class="group-n">—</span></h4><ul class="cards" id="falta-web"></ul></div>
+    </section>
+    <section class="col" data-col="tiendita">
+      <header class="col-head"><span class="dot dot-tiendita"></span><h3>sistema-taisa-ecommerce</h3><span class="col-count"><b>—</b></span></header>
+      <p class="col-desc">La Tiendita, sobre Vendure</p>
+      <div class="group"><h4 class="group-head"><span class="pip pip-listo"></span>Listo <span class="group-n">—</span></h4><ul class="cards" id="listo-tiendita"></ul></div>
+      <div class="group"><h4 class="group-head"><span class="pip pip-falta"></span>Falta definir <span class="group-n">—</span></h4><ul class="cards" id="falta-tiendita"></ul></div>
+    </section>
+  </div>
+
+  <footer>
+    Cada tarjeta abre su issue en GitHub. <b>Listo</b> quiere decir las dos cosas a la vez: no queda ninguna decisión abierta y está escrito cómo se comprueba que quedó resuelto.
+    Los datos salen de los labels del tracker: se leen de GitHub al abrir la página, cada minuto mientras está abierta y cada vez que se toca <b>Refrescar</b>.
+  </footer>
+</div>
+
+<script>
+const APPS = ["api", "web", "tiendita"];
+const PRIO_ORD = { critico: 0, alto: 1, medio: 2, bajo: 3 };
+const PRIO_LABEL = { critico: "crítico", alto: "alto", medio: "medio", bajo: "bajo" };
+const TIPO_LABEL = { bug: "defecto", deuda: "deuda", decision: "decisión", tarea: "tarea", indice: "índice", otro: "otro" };
+const WHO_LABEL = { agente: "agente", sergio: "Sergio", gabriel: "Gabriel" };
+
+let DATA = [];
+let META = null;
+const active = { app: new Set(), tipo: new Set(), prio: new Set() };
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function hace(iso) {
+  if (!iso) return "sin fecha";
+  const ms = Date.now() - Date.parse(iso);
+  if (!isFinite(ms)) return "sin fecha";
+  const m = Math.round(ms / 60000);
+  if (m < 1) return "hace un momento";
+  if (m < 60) return "hace " + m + " min";
+  const h = Math.round(m / 60);
+  if (h < 24) return "hace " + h + (h === 1 ? " hora" : " horas");
+  const d = Math.round(h / 24);
+  return "hace " + d + (d === 1 ? " día" : " días");
+}
+
+function pintarEstado(texto, clase) {
+  document.getElementById("estado-texto").textContent = texto;
+  document.getElementById("latido").className = "latido" + (clase ? " " + clase : "");
+}
+
+function refrescarEstado() {
+  if (!META) return;
+  const viejo = Date.now() - Date.parse(META.actualizado) > 5 * 60 * 1000;
+  pintarEstado(
+    META.total + " issues abiertos · leído del tracker " + hace(META.actualizado),
+    viejo ? "frio" : "vivo"
+  );
+}
+
+function pasa(it) {
+  if (active.app.size && !it.apps.some((a) => active.app.has(a))) return false;
+  if (active.tipo.size && !active.tipo.has(it.tipo)) return false;
+  if (active.prio.size && !active.prio.has(it.prio)) return false;
+  return true;
+}
+
+function tarjeta(it) {
+  const li = document.createElement("li");
+  li.className = "card";
+  li.style.setProperty("--prio", "var(--p-" + it.prio + ")");
+  const go = it.go ? '<span class="tag tag-go">' + esc(it.go) + "</span>" : "";
+  const cruza = it.apps.length > 1 ? '<span class="tag tag-cruza">' + esc(it.apps.join(" + ")) + "</span>" : "";
+  li.innerHTML =
+    '<a class="card-link" href="' + esc(it.url) + '" target="_blank" rel="noopener noreferrer">' +
+    '<div class="card-top"><span class="num">#' + it.n + "</span>" +
+    '<span class="tag">' + esc(TIPO_LABEL[it.tipo] || it.tipo) + "</span>" + go + cruza + "</div>" +
+    '<div class="card-t">' + esc(it.t) + "</div>" +
+    '<div class="card-foot"><span>prioridad ' + esc(PRIO_LABEL[it.prio] || it.prio) + "</span>" +
+    '<span aria-hidden="true">·</span><span class="who">lo hace: ' + esc(WHO_LABEL[it.quien] || it.quien) + "</span></div>" +
+    "</a>";
+  return li;
+}
+
+function render() {
+  const visibles = DATA.filter(pasa);
+  document.getElementById("tally").hidden = false;
+  document.getElementById("n-listo").textContent = visibles.filter((i) => i.liston === "listo").length;
+  document.getElementById("n-falta").textContent = visibles.filter((i) => i.liston !== "listo").length;
+  document.getElementById("n-cruza").textContent = visibles.filter((i) => i.apps.length > 1).length;
+  document.getElementById("n-agente").textContent = visibles.filter((i) => i.quien === "agente" && i.liston === "listo").length;
+
+  for (const app of APPS) {
+    for (const g of ["listo", "falta"]) {
+      const ul = document.getElementById(g + "-" + app);
+      if (!ul) continue;
+      ul.textContent = "";
+      const items = visibles
+        .filter((it) => it.apps.includes(app) && (g === "listo" ? it.liston === "listo" : it.liston !== "listo"))
+        .sort((a, b) => (PRIO_ORD[a.prio] - PRIO_ORD[b.prio]) || (b.n - a.n));
+      if (!items.length) {
+        const li = document.createElement("li");
+        li.className = "empty";
+        li.textContent = DATA.length ? "Nada con este filtro." : "Sin datos todavía.";
+        ul.appendChild(li);
+      } else {
+        items.forEach((it) => ul.appendChild(tarjeta(it)));
+      }
+      ul.closest(".group").querySelector(".group-n").textContent = items.length;
+    }
+    const col = document.querySelector('[data-col="' + app + '"]');
+    col.querySelector(".col-count b").textContent = visibles.filter((it) => it.apps.includes(app)).length;
+  }
+}
+
+document.querySelectorAll(".chip").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const set = active[btn.dataset.f];
+    const v = btn.dataset.v;
+    if (set.has(v)) { set.delete(v); btn.setAttribute("aria-pressed", "false"); }
+    else { set.add(v); btn.setAttribute("aria-pressed", "true"); }
+    render();
+  });
+});
+
+const botonRefrescar = document.getElementById("refrescar");
+let leyendo = false;
+
+async function cargar(fresco) {
+  if (leyendo) return;
+  leyendo = true;
+  botonRefrescar.disabled = true;
+  if (fresco) pintarEstado("Leyendo el tracker…", "");
+  try {
+    const r = await fetch("/api/issues" + (fresco ? "?fresh=true" : ""), { cache: "no-store" });
+    const d = await r.json().catch(() => null);
+    if (!r.ok || !d) throw new Error((d && d.message) || "HTTP " + r.status);
+    DATA = Array.isArray(d.issues) ? d.issues : [];
+    META = d.meta || null;
+    refrescarEstado();
+    render();
+  } catch (e) {
+    const ultimo = META ? " · lo último que se ve es de " + hace(META.actualizado) : "";
+    pintarEstado("No se pudo leer el tracker (" + e.message + ")" + ultimo + ".", "frio");
+  } finally {
+    leyendo = false;
+    botonRefrescar.disabled = false;
+  }
+}
+
+botonRefrescar.addEventListener("click", () => cargar(true));
+
+render();
+cargar(false);
+setInterval(() => cargar(false), 60000);
+</script>
+</body>
+</html>
