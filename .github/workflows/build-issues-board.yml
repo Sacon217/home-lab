@@ -1,0 +1,29 @@
+name: build-issues-board
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'projects/issues-board/**'
+      - '.github/workflows/build-issues-board.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: ./projects/issues-board
+          push: true
+          tags: |
+            ghcr.io/sacon217/issues-board:latest
+            ghcr.io/sacon217/issues-board:${{ github.sha }}
