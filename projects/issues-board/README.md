@@ -40,8 +40,10 @@ Labels read from each issue:
 The image is built by GitHub Actions on every push to `main` that touches this folder and
 published as `ghcr.io/sacon217/issues-board:latest` and `:<sha>`.
 
-1. In Portainer, create a stack on the target node with the contents of `docker-compose.yml`
-   (drop the `build:` block) and set the variables above as stack environment variables.
+1. In Portainer, create a stack on the target node from this repository (compose path
+   `projects/issues-board/docker-compose.yml`) and set the variables above as stack
+   environment variables.
 2. In Nginx Proxy Manager, add a proxy host pointing to `<node IP>:8010`.
 
-To run it locally instead: `cp .env.example .env`, fill it in, then `docker compose up -d --build`.
+To run it locally instead: `cp .env.example .env`, fill it in, then
+`docker build -t ghcr.io/sacon217/issues-board:latest . && docker compose up -d`.
