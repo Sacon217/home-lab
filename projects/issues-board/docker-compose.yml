@@ -1,9 +1,6 @@
 services:
   issues-board:
     image: ghcr.io/sacon217/issues-board:latest
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: issues-board
     restart: unless-stopped
     environment:
