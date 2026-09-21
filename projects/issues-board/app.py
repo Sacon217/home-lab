@@ -17,6 +17,7 @@ CACHE_SECONDS = 30
 PRIOS = ["critico", "alto", "medio", "bajo"]
 TIPOS = ["bug", "deuda", "decision", "tarea", "indice"]
 STATIC = Path(__file__).parent / "static"
+SUMMARY_CHARS = 320
 
 cache = {"at": 0.0, "data": None}
 lock = threading.Lock()
@@ -68,6 +69,20 @@ def fetch_open_issues(repo):
     return [item for item in items if "pull_request" not in item]
 
 
+def summarize(body):
+    text = re.sub(r"```.*?```", " ", body or "", flags=re.S)
+    text = re.sub(r"<!--.*?-->", " ", text, flags=re.S)
+    text = re.sub(r"!\[[^\]]*\]\([^)]*\)", " ", text)
+    text = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", text)
+    lines = [l for l in text.splitlines() if l.strip() and not l.lstrip().startswith(("#", "|", ">"))]
+    text = " ".join(re.sub(r"^\s*(?:[-*+]|\d+\.)\s+(?:\[[ xX]\]\s*)?", "", l) for l in lines)
+    text = re.sub(r"[*_`]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    if len(text) <= SUMMARY_CHARS:
+        return text
+    return text[:SUMMARY_CHARS].rsplit(" ", 1)[0].rstrip(",;:.") + "…"
+
+
 def classify(issue, settings):
     labels = {label["name"] for label in issue["labels"]}
     apps = [a["key"] for a in settings["apps"] if f"app:{a['key']}" in labels]
@@ -79,6 +94,7 @@ def classify(issue, settings):
     return {
         "n": issue["number"],
         "t": issue["title"],
+        "resumen": summarize(issue.get("body")),
         "url": issue["html_url"],
         "apps": apps,
         "tipo": next((t for t in TIPOS if t in labels), "otro"),
