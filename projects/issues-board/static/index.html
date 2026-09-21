@@ -43,7 +43,7 @@
 
 * { box-sizing:border-box; }
 body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--body); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased; }
-.wrap { max-width:1180px; margin:0 auto; padding-inline:16px; padding-block:36px 64px; }
+.wrap { max-width:1320px; margin:0 auto; padding-inline:16px; padding-block:36px 64px; }
 h1,h2,h3,h4 { font-family:var(--display); margin:0; text-wrap:balance; letter-spacing:-.015em; }
 a { color:inherit; }
 
@@ -86,6 +86,11 @@ h1 { font-size:clamp(27px,5vw,40px); font-weight:700; line-height:1.08; }
 .col-desc { margin:6px 0 16px; font-size:12px; color:var(--muted); }
 .dot { width:8px; height:8px; border-radius:50%; flex:none; display:inline-block; }
 .group + .group { margin-top:18px; }
+.board[data-vista="una"] .col { padding:20px 20px 18px; }
+.board[data-vista="una"] .col-body { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; align-items:start; }
+.board[data-vista="una"] .group + .group { margin-top:0; }
+.board:not([data-vista="todas"]) .card a.card-link { padding:12px 14px 12px 16px; }
+.board:not([data-vista="todas"]) .card-t { font-size:14.5px; font-weight:500; }
 .group-head { display:flex; align-items:center; gap:7px; font-family:var(--body); font-size:12px; font-weight:600; letter-spacing:.03em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; }
 .group-n { font-family:var(--mono); font-weight:400; }
 .pip { width:9px; height:9px; border-radius:2px; display:inline-block; flex:none; }
@@ -103,6 +108,9 @@ h1 { font-size:clamp(27px,5vw,40px); font-weight:700; line-height:1.08; }
 .tag-go { color:var(--accent); border-color:var(--accent); }
 .tag-cruza { color:var(--ink-2); background:var(--sunken); border-color:transparent; }
 .card-t { font-size:13px; line-height:1.42; color:var(--ink); }
+.card-resumen { display:none; margin:6px 0 0; font-size:13px; line-height:1.5; color:var(--ink-2); overflow-wrap:anywhere; }
+.board:not([data-vista="todas"]) .card-resumen { display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3; overflow:hidden; }
+.board[data-vista="una"] .card-resumen { -webkit-line-clamp:5; }
 .card-foot { margin-top:6px; display:flex; gap:6px; flex-wrap:wrap; font-size:11px; color:var(--muted); }
 .who { font-family:var(--mono); font-size:10.5px; }
 .empty { font-size:12px; color:var(--muted); font-style:italic; padding:6px 0; }
@@ -110,7 +118,7 @@ h1 { font-size:clamp(27px,5vw,40px); font-weight:700; line-height:1.08; }
 footer { margin-top:44px; padding-top:18px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted); max-width:70ch; }
 footer code { font-family:var(--mono); font-size:11.5px; background:var(--sunken); padding:1px 5px; border-radius:3px; }
 
-@media (max-width:880px) { .board { grid-template-columns:1fr; } }
+@media (max-width:880px) { .board { grid-template-columns:1fr; } .board[data-vista="una"] .col-body { grid-template-columns:1fr; gap:0; } .board[data-vista="una"] .group + .group { margin-top:18px; } }
 @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
 </style>
 </head>
@@ -217,6 +225,7 @@ function tarjeta(it) {
     '<div class="card-top"><span class="num">#' + it.n + "</span>" +
     '<span class="tag">' + esc(TIPO_LABEL[it.tipo] || it.tipo) + "</span>" + go + cruza + "</div>" +
     '<div class="card-t">' + esc(it.t) + "</div>" +
+    (it.resumen ? '<p class="card-resumen">' + esc(it.resumen) + "</p>" : "") +
     '<div class="card-foot"><span>prioridad ' + esc(PRIO_LABEL[it.prio] || it.prio) + "</span>" +
     (it.quien ? '<span aria-hidden="true">·</span><span class="who">lo hace: ' + esc(it.quien) + "</span>" : "") + "</div>" +
     "</a>";
@@ -225,6 +234,10 @@ function tarjeta(it) {
 
 function render() {
   const visibles = DATA.filter(pasa);
+  const board = document.getElementById("board");
+  const enVista = APPS.filter((a) => !active.app.size || active.app.has(a.key));
+  board.style.setProperty("--cols", Math.max(enVista.length, 1));
+  board.dataset.vista = enVista.length === 1 ? "una" : enVista.length < APPS.length ? "varias" : "todas";
   document.getElementById("tally").hidden = false;
   document.getElementById("n-listo").textContent = visibles.filter((i) => i.liston === "listo").length;
   document.getElementById("n-falta").textContent = visibles.filter((i) => i.liston !== "listo").length;
@@ -251,6 +264,7 @@ function render() {
       ul.closest(".group").querySelector(".group-n").textContent = items.length;
     }
     const col = document.getElementById("col-" + idx);
+    col.hidden = !enVista.includes(a);
     col.querySelector(".col-count b").textContent = visibles.filter((it) => it.apps.includes(app)).length;
   });
 }
@@ -270,7 +284,6 @@ function armarApps(apps) {
   chips.textContent = "";
   const board = document.getElementById("board");
   board.textContent = "";
-  board.style.setProperty("--cols", Math.max(APPS.length, 1));
   APPS.forEach((a, idx) => {
     const color = "var(--app-" + ((idx % 5) + 1) + ")";
     const btn = document.createElement("button");
@@ -286,8 +299,10 @@ function armarApps(apps) {
     col.innerHTML =
       '<header class="col-head"><span class="dot" style="background:' + color + '"></span><h3>' + esc(a.name) + '</h3><span class="col-count"><b>—</b></span></header>' +
       (a.desc ? '<p class="col-desc">' + esc(a.desc) + "</p>" : "") +
+      '<div class="col-body">' +
       '<div class="group"><h4 class="group-head"><span class="pip pip-listo"></span>Listo <span class="group-n">—</span></h4><ul class="cards" id="listo-' + idx + '"></ul></div>' +
-      '<div class="group"><h4 class="group-head"><span class="pip pip-falta"></span>Falta definir <span class="group-n">—</span></h4><ul class="cards" id="falta-' + idx + '"></ul></div>';
+      '<div class="group"><h4 class="group-head"><span class="pip pip-falta"></span>Falta definir <span class="group-n">—</span></h4><ul class="cards" id="falta-' + idx + '"></ul></div>' +
+      "</div>";
     board.appendChild(col);
   });
 }
