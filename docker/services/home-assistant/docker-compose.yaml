@@ -1,0 +1,25 @@
+services:
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homeassistant
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    environment:
+      TZ: "America/Costa_Rica"
+    volumes:
+      - "/srv/docker/homeassistant/config:/config"
+      - "/run/dbus:/run/dbus:ro"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8123/manifest.json > /dev/null || exit 1"]
+      interval: 60s
+      start_period: 60s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+ 
+Claude finished the response
