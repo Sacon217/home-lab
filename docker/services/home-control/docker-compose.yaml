@@ -1,10 +1,27 @@
 services:
+  go2rtc:
+    image: alexxit/go2rtc:latest
+    container_name: go2rtc
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      TZ: "America/Costa_Rica"
+    volumes:
+      - "/srv/docker/go2rtc/config:/config"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   homeassistant:
     image: ghcr.io/home-assistant/home-assistant:stable
     container_name: homeassistant
     restart: unless-stopped
     privileged: true
     network_mode: host
+    depends_on:
+      - go2rtc
     environment:
       TZ: "America/Costa_Rica"
     volumes:
