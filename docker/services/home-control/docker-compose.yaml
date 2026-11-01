@@ -22,6 +22,9 @@ services:
     restart: unless-stopped
     privileged: true
     network_mode: host
+    environment:
+      TZ: "America/Costa_Rica"
+      GO2RTC_URL: "http://${GO2RTC_USER}:${GO2RTC_PASS}@127.0.0.1:1984"
     depends_on:
       - go2rtc
     environment:
