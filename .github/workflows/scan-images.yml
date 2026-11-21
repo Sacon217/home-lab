@@ -1,0 +1,27 @@
+name: scan-images
+on:
+  pull_request:
+    paths: ['docker/services/**']
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: aquasecurity/setup-trivy@v0.2.2
+      - name: Scan images changed in this PR
+        env:
+          BASE: ${{ github.base_ref }}
+        run: |
+          FILES=$(git diff --name-only "origin/$BASE...HEAD" -- 'docker/services/**/*.yml' 'docker/services/**/*.yaml')
+          [ -z "$FILES" ] && { echo "No compose changes"; exit 0; }
+          IMAGES=$(grep -hE '^\s*image:' $FILES | awk '{print $2}' | tr -d '"' | sort -u)
+          FAIL=0
+          for img in $IMAGES; do
+            echo "::group::$img"
+            trivy image --severity CRITICAL --ignore-unfixed \
+              --exit-code 1 --no-progress "$img" || FAIL=1
+            echo "::endgroup::"
+          done
+          exit $FAIL
