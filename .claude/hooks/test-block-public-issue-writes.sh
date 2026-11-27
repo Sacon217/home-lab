@@ -45,5 +45,17 @@ check allow 'gh pr create --fill'
 check allow 'echo gh issue'
 check allow 'git status'
 
+# Quoted text is not flags (review finding 1)
+check allow 'gh issue comment 3 -R Sacon217/home-lab-ops --body "Fixed with chmod -R 750 /srv/data"'
+check allow "gh issue comment 3 -R Sacon217/home-lab-ops --body 'grep -R foo /etc'"
+check deny  'gh issue create --title x --body " -R Sacon217/home-lab-ops"'
+check allow 'gh issue create -R "Sacon217/home-lab-ops" --title x'
+check allow 'gh issue create --title "a; b | c" -R Sacon217/home-lab-ops'
+
+# Line continuations (review finding 2)
+check allow $'gh issue create \\\n  -R Sacon217/home-lab-ops \\\n  --title x'
+check deny  $'gh api repos/Sacon217/home-lab/issues \\\n  --method POST -f title=x'
+check deny  $'gh issue list\ngh issue create --title x'
+
 echo "passed $pass, failed $fail"
 [ "$fail" -eq 0 ]

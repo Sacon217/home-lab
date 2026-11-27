@@ -23,8 +23,18 @@ deny() {
 gh_prefix='(^|[[:space:](])([^[:space:]]*/)?gh[[:space:]]+'
 issue_writes='create|edit|comment|close|reopen|delete|transfer|pin|unpin|lock|unlock|develop'
 
-# Judge each segment of a compound command on its own.
-segments=$(printf '%s\n' "$cmd" | sed -E 's/(&&|\|\||;|\|)/\n/g')
+# Normalize before judging:
+#  1. join "\"+newline continuations
+#  2. unquote the tracker name itself (-R "Sacon217/home-lab-ops")
+#  3. blank every other quoted string, so text like --body "chmod -R 750" is never read as flags
+#  4. split compound commands on ; && || | and newlines, and judge each segment on its own
+segments=$(printf '%s' "$cmd" | TRACKER="$TRACKER" perl -0777 -pe '
+  s/\\\n/ /g;
+  s/(["\x27])\Q$ENV{TRACKER}\E\1/$ENV{TRACKER}/g;
+  s/"(?:[^"\\]|\\.)*"/Q/gs;
+  s/\x27[^\x27]*\x27/Q/gs;
+  s/(&&|\|\||;|\|)/\n/g;
+')
 
 while IFS= read -r seg; do
   if printf '%s' "$seg" | grep -Eq "${gh_prefix}issue[[:space:]]+(${issue_writes})([[:space:]]|\$)"; then
