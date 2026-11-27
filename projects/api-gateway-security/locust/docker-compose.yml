@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   locust:
-    image: python:3.11-slim
+    image: python:3.15-slim
     container_name: locust
     restart: always
     working_dir: /app
