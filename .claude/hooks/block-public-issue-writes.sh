@@ -11,6 +11,7 @@ my $WRITES = qr/create|new|edit|comment|close|reopen|delete|transfer|pin|unpin|l
 my $GH = qr/(?:^|[\s(])(?:\S*\/)?gh\s+/;
 my $SHELL = qr/\b(?:ba|z|da|k)?sh\b/;
 
+my $ask;
 local $/; my $raw = <STDIN>;
 $raw =~ s/\\\n/ /g;
 
@@ -26,13 +27,17 @@ while (my $item = shift @queue) {
     "$pre<<$delim$post";
   }gse;
 
-  if ($text =~ /${GH}api\s+graphql\b/i && $text =~ /\bmutation\b/i && $text =~ /issue|comment/i) {
-    print "Blocked: gh api graphql issue/comment mutations are not allowed here. Use REST against repos/Sacon217/home-lab-ops."; exit;
+  if ($text =~ /${GH}api\s+graphql\b/i && ($text =~ /\bmutation\b/i || $text =~ /=\@|--input\b/)) {
+    $ask //= "gh api graphql mutation (or a query read from a file): the target repo cannot be verified. Approve only if it does not write to the public repo.";
   }
 
   push @nested, $1 while $text =~ /\$\(([^()]*)\)/g;
   push @nested, $1 while $text =~ /`([^`]*)`/g;
-  push @nested, $2 while $text =~ /(?:$SHELL(?:\s+-\w+)*\s+-\w*c|\beval)\s+(["\x27])(.*?)(?<!\\)\1/gs;
+  while ($text =~ /(?:$SHELL(?:\s+-\w+)*\s+-\w*c|\beval)\s+(["\x27])(.*?)(?<!\\)\1/gs) {
+    my $body = $2;
+    $ask //= "Command hidden in a variable (sh -c / eval): it cannot be checked. Approve only if it does not write issues to the public repo." if $body =~ /^\s*\$/;
+    push @nested, $body;
+  }
   for (@nested) { (my $n = $_) =~ s/\\(["\x27`\$])/$1/g; push @queue, [$n, $depth + 1]; }
 
   $text =~ s/(["\x27])((?:github\.com\/)?sacon217\/home-lab-ops)\1/$2/gi;
@@ -47,7 +52,7 @@ while (my $item = shift @queue) {
       my $repo = @repos ? $repos[-1] : "";
       (my $norm = lc $repo) =~ s{^github\.com/}{};
       if ($norm ne $T) {
-        print "Blocked: gh issue write must target the private tracker with -R Sacon217/home-lab-ops (got \x27" . ($repo || "none") . "\x27). Write the repo name literally. This repo is public; see CLAUDE.md.";
+        print "deny\tBlocked: gh issue write must target the private tracker with -R Sacon217/home-lab-ops (got \x27" . ($repo || "none") . "\x27). Write the repo name literally. This repo is public; see CLAUDE.md.";
         exit;
       }
     }
@@ -56,19 +61,31 @@ while (my $item = shift @queue) {
       my $fields = $seg =~ /(?:^|\s)(?:-[fF]|--field|--raw-field|--input)/;
       my $write  = ($method && $method ne "GET") || (!$method && $fields);
       if ($write && $seg =~ m{repos/([^/\s]+/[^/\s]+)/issues}i && lc($1) ne $T) {
-        print "Blocked: gh api write against issues of \x27$1\x27. Only repos/Sacon217/home-lab-ops may be written. See CLAUDE.md.";
+        print "deny\tBlocked: gh api write against issues of \x27$1\x27. Only repos/Sacon217/home-lab-ops may be written. See CLAUDE.md.";
         exit;
+      }
+      if ($write && !$ask) {
+        my ($seen, $skip, $ep) = (0, 0, "");
+        for my $t (split /\s+/, $seg) {
+          if (!$seen) { $seen = 1 if $t eq "api"; next; }
+          if ($skip) { $skip = 0; next; }
+          if ($t =~ /^(?:-X|--method|-f|-F|--field|--raw-field|-H|--header|--input|-q|--jq|-t|--template|--hostname|--cache|-p|--preview)$/) { $skip = 1; next; }
+          next if $t =~ /^-/;
+          $ep = $t; last;
+        }
+        $ask = "gh api write to an endpoint that cannot be read (quoted or in a variable). Approve only if it does not write issues to the public repo." if $ep eq "Q" || $ep =~ /^\$/;
       }
     }
   }
 }
+print "ask\t$ask" if $ask;
 ')
 
 if [ -n "$reason" ]; then
-  jq -n --arg r "$reason" '{
+  jq -n --arg d "${reason%%$'\t'*}" --arg r "${reason#*$'\t'}" '{
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
-      permissionDecision: "deny",
+      permissionDecision: $d,
       permissionDecisionReason: $r
     }
   }'

@@ -6,11 +6,9 @@ pass=0; fail=0
 decide() {
   local out
   out=$(jq -n --arg c "$1" '{tool_name:"Bash",tool_input:{command:$c}}' | bash "$HOOK" 2>/dev/null)
-  if printf '%s' "$out" | jq -e '.hookSpecificOutput.permissionDecision=="deny"' >/dev/null 2>&1; then
-    echo deny
-  else
-    echo allow
-  fi
+  local d
+  d=$(printf '%s' "$out" | jq -r '.hookSpecificOutput.permissionDecision // empty' 2>/dev/null)
+  echo "${d:-allow}"
 }
 
 check() {
@@ -73,7 +71,7 @@ check deny  'gh api repos/Sacon217/home-lab/issues -ftitle=x'
 check deny  'gh api repos/Sacon217/home-lab/issues --raw-field title=x'
 check deny  'gh api repos/{owner}/{repo}/issues -f title=x'
 check deny  'gh api repos/sacon217/HOME-LAB/issues -f title=x'
-check deny  "gh api graphql -f query='mutation{createIssue(input:{repositoryId:\"x\",title:\"y\"}){issue{number}}}'"
+check ask   "gh api graphql -f query='mutation{createIssue(input:{repositoryId:\"x\",title:\"y\"}){issue{number}}}'"
 check allow 'gh api -X GET repos/Sacon217/home-lab/issues -f state=all'
 check allow 'gh api repos/Sacon217/home-lab-ops/issues -f title=x'
 check allow "gh api graphql -f query='query{viewer{login}}'"
@@ -86,6 +84,17 @@ check allow 'gh api -X POST /repos/Sacon217/home-lab-ops/issues -f title=x'
 check allow 'git commit -m "hook blocks gh issue create without -R"'
 check allow $'git commit -F - <<\'EOF\'\nmention gh issue create here\nEOF'
 check allow $'gh pr create --title t --body "$(cat <<\'EOF\'\nblocks gh issue create\nEOF\n)"'
+
+check ask   "gh api graphql -f query='mutation{addReaction(input:{subjectId:\"x\",content:HOORAY}){reaction{content}}}'"
+check ask   "gh api graphql -f query='mutation{lockLockable(input:{lockableId:\"x\"}){clientMutationId}}'"
+check ask   'gh api graphql -F query=@payload.graphql'
+check ask   'gh api graphql --input body.json'
+check allow "gh api graphql -f query='{ viewer { login } }'"
+check ask   'bash -c "$CMD"'
+check ask   'eval "$NEXT"'
+check ask   'gh api -X POST "$URL" -f title=x'
+check allow 'bash -c "echo $HOME"'
+check allow 'gh api "$URL"'
 
 echo "passed $pass, failed $fail"
 [ "$fail" -eq 0 ]
