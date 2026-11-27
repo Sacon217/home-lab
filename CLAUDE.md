@@ -7,3 +7,5 @@
 - Issues stay enabled here only for Renovate (Dependency Dashboard, config-error alerts).
 - `docs/` here is the sanitized, public write-up: methodology, generic runbooks, CIS mapping.
 - The user runs remediation actions on the hosts; the agent guides, researches, reviews and documents.
+- No code comments in code the agent writes (scripts, YAML, Dockerfiles, compose, Python). Names and docs carry the explanation; shebangs stay.
+- No AI attribution anywhere: no co-author trailers, no "generated with" lines, no Anthropic noreply address in commits, PR bodies, issues or files. Enforced by `.githooks/commit-msg` (run `git config core.hooksPath .githooks` after cloning) and the `no-ai-attribution` PR check.
