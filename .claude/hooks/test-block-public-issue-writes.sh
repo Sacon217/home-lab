@@ -57,5 +57,39 @@ check allow $'gh issue create \\\n  -R Sacon217/home-lab-ops \\\n  --title x'
 check deny  $'gh api repos/Sacon217/home-lab/issues \\\n  --method POST -f title=x'
 check deny  $'gh issue list\ngh issue create --title x'
 
+# Nested / wrapped commands (PR #16 scan)
+check deny  "bash -c 'gh issue create --title x'"
+check deny  'sh -c "gh issue comment 1 -R Sacon217/home-lab -b x"'
+check deny  'echo "$(gh issue create --title x)"'
+check deny  'echo `gh issue create --title x`'
+check deny  'eval "gh issue create --title x"'
+check deny  $'bash <<\'EOF\'\ngh issue create --title x\nEOF'
+check deny  '"gh" issue create --title x'
+check deny  'ls | xargs gh issue create --title x'
+check allow "bash -c 'gh issue create -R Sacon217/home-lab-ops --title x'"
+
+# gh issue verb forms
+check deny  'gh issue new --title x'
+check deny  'gh issue -R Sacon217/home-lab create --title x'
+check allow 'gh issue -R Sacon217/home-lab-ops create --title x'
+check allow 'gh issue edit 4 -R sacon217/home-lab-ops --add-label ready'
+
+# gh api forms (PR #16 scan)
+check deny  'gh api --method=POST repos/Sacon217/home-lab/issues -f title=x'
+check deny  'gh api -XPOST repos/Sacon217/home-lab/issues'
+check deny  'gh api repos/Sacon217/home-lab/issues -ftitle=x'
+check deny  'gh api repos/Sacon217/home-lab/issues --raw-field title=x'
+check deny  'gh api repos/{owner}/{repo}/issues -f title=x'
+check deny  'gh api repos/sacon217/HOME-LAB/issues -f title=x'
+check deny  "gh api graphql -f query='mutation{createIssue(input:{repositoryId:\"x\",title:\"y\"}){issue{number}}}'"
+check allow 'gh api -X GET repos/Sacon217/home-lab/issues -f state=all'
+check allow 'gh api repos/Sacon217/home-lab-ops/issues -f title=x'
+check allow "gh api graphql -f query='query{viewer{login}}'"
+
+# Prose mentioning gh issue must not be blocked
+check allow 'git commit -m "hook blocks gh issue create without -R"'
+check allow $'git commit -F - <<\'EOF\'\nmention gh issue create here\nEOF'
+check allow $'gh pr create --title t --body "$(cat <<\'EOF\'\nblocks gh issue create\nEOF\n)"'
+
 echo "passed $pass, failed $fail"
 [ "$fail" -eq 0 ]
