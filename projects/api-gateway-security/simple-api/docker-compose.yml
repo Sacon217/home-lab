@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   simple-api:
-    image: python:3.11-slim
+    image: python:3.15-slim
     restart: always
     working_dir: /app
     environment:
