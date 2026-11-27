@@ -45,6 +45,7 @@ while (my $item = shift @queue) {
   # Top level: unquote the tracker name and a quoted "gh", blank all other quoted text.
   $text =~ s/(["\x27])((?:github\.com\/)?sacon217\/home-lab-ops)\1/$2/gi;
   $text =~ s/(["\x27])gh\1/gh/g;
+  $text =~ s{(["\x27])((?:https?://[^\s"\x27/]+)?/?repos/[^\s"\x27]+)\1}{$2}gi;  # quoted API endpoints
   $text =~ s/"(?:[^"\\]|\\.)*"/Q/gs;
   $text =~ s/\x27[^\x27]*\x27/Q/gs;
 

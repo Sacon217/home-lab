@@ -86,6 +86,12 @@ check allow 'gh api -X GET repos/Sacon217/home-lab/issues -f state=all'
 check allow 'gh api repos/Sacon217/home-lab-ops/issues -f title=x'
 check allow "gh api graphql -f query='query{viewer{login}}'"
 
+# Endpoint spellings (PR #16 scan, 2nd pass)
+check deny  'gh api -X POST /repos/Sacon217/home-lab/issues -f title=x'
+check deny  'gh api -X POST https://api.github.com/repos/Sacon217/home-lab/issues -f title=x'
+check deny  'gh api --method PATCH "/repos/Sacon217/home-lab/issues/1" -f state=closed'
+check allow 'gh api -X POST /repos/Sacon217/home-lab-ops/issues -f title=x'
+
 # Prose mentioning gh issue must not be blocked
 check allow 'git commit -m "hook blocks gh issue create without -R"'
 check allow $'git commit -F - <<\'EOF\'\nmention gh issue create here\nEOF'
