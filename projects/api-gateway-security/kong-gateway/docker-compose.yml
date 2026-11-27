@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   kong-data-plane:
-    image: kong/kong-gateway:3.13
+    image: kong/kong-gateway:3.16
     container_name: kong-gateway
     environment:
       KONG_ROLE: data_plane
