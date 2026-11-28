@@ -96,5 +96,23 @@ check ask   'gh api -X POST "$URL" -f title=x'
 check allow 'bash -c "echo $HOME"'
 check allow 'gh api "$URL"'
 
+check deny  'gh "issue" create --title x'
+check deny  "gh 'issue' create --title x"
+check deny  'gh i"ssue" create --title x'
+check deny  'gh issue "create" --title x'
+check deny  'g"h" issue create --title x'
+check deny  'gh is\sue create --title x'
+check deny  'gh issue create --title x --body "-RSacon217/home-lab-ops"'
+check deny  'gh api -X "POST" repos/Sacon217/home-lab/issues'
+check allow 'gh "issue" create -R Sacon217/home-lab-ops --title x'
+check allow 'gh issue "view" 3'
+check ask   'gh "$SUB" create --title x'
+check ask   '$GH issue create --title x'
+check ask   '"$GH" issue create --title x'
+check ask   '$(which gh) issue create --title x'
+check deny  'command gh issue create --title x'
+check deny  'find . -exec gh issue create --title x \;'
+check allow 'echo $HOME issue'
+
 echo "passed $pass, failed $fail"
 [ "$fail" -eq 0 ]

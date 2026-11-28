@@ -41,12 +41,15 @@ while (my $item = shift @queue) {
   for (@nested) { (my $n = $_) =~ s/\\(["\x27`\$])/$1/g; push @queue, [$n, $depth + 1]; }
 
   $text =~ s/(["\x27])((?:github\.com\/)?sacon217\/home-lab-ops)\1/$2/gi;
-  $text =~ s/(["\x27])gh\1/gh/g;
+  $text =~ s/(["\x27])([^\s"\x27\\\$`;&|<>()\-][^\s"\x27\\\$`;&|<>()]*)\1/$2/g;
   $text =~ s{(["\x27])((?:https?://[^\s"\x27/]+)?/?repos/[^\s"\x27]+)\1}{$2}gi;
   $text =~ s/"(?:[^"\\]|\\.)*"/Q/gs;
   $text =~ s/\x27[^\x27]*\x27/Q/gs;
+  $text =~ s/\\([A-Za-z])/$1/g;
 
   for my $seg (split /&&|\|\||;|\||\n/, $text) {
+    $ask //= "gh subcommand is quoted or in a variable: it cannot be checked. Approve only if it does not write issues to the public repo." if $seg =~ /${GH}(?:issue\s+)?Q(?:\s|$)/
+      || $seg =~ /^\s*(?:\w+=\S*\s+)*(?:Q|\$\{?\w+\}?|\$\([^)]*\))\s+(?:issue|api)\b/;
     if ($seg =~ /${GH}issue((?:\s+(?:-R|--repo)(?:=|\s+)\S+|\s+-\S+)*)\s+(?:$WRITES)(?:\s|$)/) {
       my @repos = $seg =~ /(?:^|\s)(?:-R|--repo)(?:=|\s*)(\S+)/g;
       my $repo = @repos ? $repos[-1] : "";
